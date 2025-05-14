@@ -19,14 +19,14 @@ public class MakeMyTripFieldsTest {
 
         // Define test data: each pair is {FromValue, ToValue}
         String[][] testData = {
-//                {"Delhi", "Mumbai"},        // TC01: Valid and distinct
-//                {"Chennai", "Chennai"},     // TC02: Valid but identical
-//                {"P", "Bangalore"},       // TC03: From too short (invalid - too short)
-//                {"Ahmedabad", "Thiruvananthapuram"}, // TC04: To too long (long name)
+                {"Delhi", "Mumbai"},        // TC01: Valid and distinct
+                {"Chennai", "Chennai"},     // TC02: Valid but identical
+                {"P", "Bangalore"},       // TC03: From too short (invalid - too short)
+                {"Ahmedabad", "Thiruvananthapuram"}, // TC04: To too long (long name)
                 {"12345", "Hyderabad"},     // TC05: From numeric
-//                {"Kolkata", "67890"},       // TC06: To numeric
-//                {"Ja@pur", "Surat"},        // TC07: From with special char
-//                {"Pune", "Lu@know"},        // TC08: To with special char
+                {"Kolkata", "67890"},       // TC06: To numeric
+                {"Ja@pur", "Surat"},        // TC07: From with special char
+                {"Pune", "Lu@know"},        // TC08: To with special char
         };
         Actions actions = new Actions(driver);
 
@@ -128,12 +128,17 @@ public class MakeMyTripFieldsTest {
 
             } catch (Exception e) {
                 // Catch any unexpected errors (e.g. element not found, timeout)
-                System.out.println("Test " + (4+1) + " encountered an exception: " + e.getMessage());
+                System.out.println("Test " + (i+1) + " encountered an exception: " + e.getMessage());
             } finally {
                 // Take a screenshot for this test case
+
                 try {
                     File screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
-                    File targetFile = new File("screenshots/mmt/TC" + (4+1) + ".png");
+                    // skip the 4th test case
+                    if (i == 4) {
+                        continue;
+                    }
+                    File targetFile = new File("screenshots/mmt/TC" + (i+1) + ".png");
                     FileUtils.copyFile(screenshot, targetFile);
                 } catch (Exception e) {
                     System.out.println("Could not capture screenshot for test " + (i+1) + ": " + e.getMessage());
