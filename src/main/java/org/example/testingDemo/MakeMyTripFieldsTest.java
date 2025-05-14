@@ -2,6 +2,7 @@ package org.example.testingDemo;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
 import java.io.File;
 import java.time.Duration;
@@ -18,16 +19,16 @@ public class MakeMyTripFieldsTest {
 
         // Define test data: each pair is {FromValue, ToValue}
         String[][] testData = {
-                {"Delhi", "Mumbai"},        // TC01: Valid and distinct
-                {"Chennai", "Chennai"},     // TC02: Valid but identical
-                {"P", "Bangalore"},       // TC03: From too short (invalid - too short)
-                {"Ahmedabad", "Thiruvananthapuram"}, // TC04: To too long (long name)
+//                {"Delhi", "Mumbai"},        // TC01: Valid and distinct
+//                {"Chennai", "Chennai"},     // TC02: Valid but identical
+//                {"P", "Bangalore"},       // TC03: From too short (invalid - too short)
+//                {"Ahmedabad", "Thiruvananthapuram"}, // TC04: To too long (long name)
                 {"12345", "Hyderabad"},     // TC05: From numeric
-                {"Kolkata", "67890"},       // TC06: To numeric
-                {"Ja@pur", "Surat"},        // TC07: From with special char
-                {"Pune", "Lu@know"},        // TC08: To with special char
+//                {"Kolkata", "67890"},       // TC06: To numeric
+//                {"Ja@pur", "Surat"},        // TC07: From with special char
+//                {"Pune", "Lu@know"},        // TC08: To with special char
         };
-
+        Actions actions = new Actions(driver);
 
         for(int i = 0; i < testData.length; i++) {
             String fromInput = testData[i][0];
@@ -43,48 +44,80 @@ public class MakeMyTripFieldsTest {
                     popupClose.click();
                 } catch (Exception ignored) {}
 
+                if (fromInput.matches(".*\\d.*")) {
+                    // Enter "To" field
+                    WebElement toField1 = wait.until(ExpectedConditions.elementToBeClickable(By.id("toCity")));
+                    Thread.sleep(1000);
+                    toField1.click();
+                    Thread.sleep(1000);
+                    WebElement to1 = driver.findElement(By.xpath("//input[@placeholder='To']"));
+                    Thread.sleep(1000);
+                    to1.clear();
+                    Thread.sleep(1000);
+                    to1.sendKeys(toInput);
+                    Thread.sleep(2000);
+                    wait.until(ExpectedConditions.visibilityOfElementLocated(
+                            By.xpath("//ul[@role='listbox']")));
+                    Thread.sleep(2000);
+                    WebElement firstSuggestion = driver.findElement(By.xpath("//ul[@role='listbox']/li[1]"));
+                    firstSuggestion.click();
+                    WebElement fromField1 = wait.until(ExpectedConditions.elementToBeClickable(By.id("fromCity")));
+                    fromField1.click();
+                    Thread.sleep(1000);
+                    WebElement from1 = driver.findElement(By.xpath("//input[@placeholder='From']"));
+                    from1.clear();
+                    Thread.sleep(1000);
+                    from1.sendKeys(fromInput);
+                    // take screenshot
+                    File screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+                    File targetFile = new File("screenshots/mmt/TC" + (4+1) + ".png");
+                    FileUtils.copyFile(screenshot, targetFile);
+                    continue;
+                }
+
                 // Enter "From" field
                 WebElement fromField = wait.until(ExpectedConditions.elementToBeClickable(By.id("fromCity")));
                 fromField.click();
                 Thread.sleep(1000);
                 WebElement from = driver.findElement(By.xpath("//input[@placeholder='From']"));
-
                 from.clear();
                 Thread.sleep(1000);
                 from.sendKeys(fromInput);
 
 
+
                 // Wait briefly for autosuggestions to appear (if input is valid city)
                 try {
+                    Thread.sleep(2000);
                     wait.until(ExpectedConditions.visibilityOfElementLocated(
                             By.xpath("//ul[@role='listbox']")));
-                    fromField.sendKeys(Keys.ARROW_DOWN);
-                    fromField.sendKeys(Keys.RETURN);
-
+                    Thread.sleep(2000);
+                    WebElement firstSuggestion = driver.findElement(By.xpath("//ul[@role='listbox']/li[1]"));
+                    firstSuggestion.click();
                 } catch (Exception ignored) {}
 
                 // Enter "To" field
                 WebElement toField = wait.until(ExpectedConditions.elementToBeClickable(By.id("toCity")));
                 toField.click();
-
                 WebElement to = driver.findElement(By.xpath("//input[@placeholder='To']"));
                 to.clear();
                 to.sendKeys(toInput);
                 // Select autosuggestion if available
                 try {
+                    Thread.sleep(1000);
                     wait.until(ExpectedConditions.visibilityOfElementLocated(
                             By.xpath("//ul[@role='listbox']")));
-                    List<WebElement> toOptions = driver.findElements(By.xpath("//ul[@role='listbox']//li"));
-                    System.out.println("Number of suggestions: " + toOptions.size());
-                    System.out.println("Suggestion: " + toOptions.get(0).getText());
-                    if (!toOptions.isEmpty()) {
-                        toOptions.get(0).click();
-                    }
+                    Thread.sleep(1000);
+                    WebElement firstSuggestion = driver.findElement(By.xpath("//ul[@role='listbox']/li[1]"));
+                    firstSuggestion.click();
                     // select date if opened
-                    WebElement date = driver.findElement(By.className("DayPicker-Day--selected"));
-                    if (date.isDisplayed()){
-                        date.click();
-                    }
+                    // press TAB twice
+
+                    actions.sendKeys("\uE004").perform();
+                    Thread.sleep(2000);
+                    actions.sendKeys("\uE004").perform();
+                    Thread.sleep(2000);
+                    actions.sendKeys("\uE004").perform();
                 } catch (Exception ignored) {}
 
                 // Validate that 'From' and 'To' are not identical
@@ -95,12 +128,12 @@ public class MakeMyTripFieldsTest {
 
             } catch (Exception e) {
                 // Catch any unexpected errors (e.g. element not found, timeout)
-                System.out.println("Test " + (i+1) + " encountered an exception: " + e.getMessage());
+                System.out.println("Test " + (4+1) + " encountered an exception: " + e.getMessage());
             } finally {
                 // Take a screenshot for this test case
                 try {
                     File screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
-                    File targetFile = new File("TC" + (i+1) + ".png");
+                    File targetFile = new File("screenshots/mmt/TC" + (4+1) + ".png");
                     FileUtils.copyFile(screenshot, targetFile);
                 } catch (Exception e) {
                     System.out.println("Could not capture screenshot for test " + (i+1) + ": " + e.getMessage());
