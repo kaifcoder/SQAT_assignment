@@ -25,8 +25,8 @@ public class MakeMyTripFieldsTest {
                 {"Ahmedabad", "Thiruvananthapuram"}, // TC04: To too long (long name)
                 {"12345", "Hyderabad"},     // TC05: From numeric
                 {"Kolkata", "67890"},       // TC06: To numeric
-                {"Ja@pur", "Surat"},        // TC07: From with special char
-                {"Pune", "Lu@know"},        // TC08: To with special char
+                {"@a@*!@r", "Surat"},        // TC07: From with special char
+                {"Pune", "@u@kn#"},        // TC08: To with special char
         };
         Actions actions = new Actions(driver);
 
@@ -44,7 +44,7 @@ public class MakeMyTripFieldsTest {
                     popupClose.click();
                 } catch (Exception ignored) {}
 
-                if (fromInput.matches(".*\\d.*")) {
+                if (fromInput.matches(".*\\d.*") || fromInput.equals("@a@*!@r")) {
                     // Enter "To" field
                     WebElement toField1 = wait.until(ExpectedConditions.elementToBeClickable(By.id("toCity")));
                     Thread.sleep(1000);
