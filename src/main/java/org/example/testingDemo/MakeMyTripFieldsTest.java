@@ -70,7 +70,7 @@ public class MakeMyTripFieldsTest {
                     from1.sendKeys(fromInput);
                     // take screenshot
                     File screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
-                    File targetFile = new File("screenshots/mmt/TC" + (4+1) + ".png");
+                    File targetFile = new File("screenshots/mmt/TC" + (i+1) + ".png");
                     FileUtils.copyFile(screenshot, targetFile);
                     continue;
                 }
@@ -135,7 +135,7 @@ public class MakeMyTripFieldsTest {
                 try {
                     File screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
                     // skip the 4th test case
-                    if (i == 4) {
+                    if (i == 4 || i == 7) {
                         continue;
                     }
                     File targetFile = new File("screenshots/mmt/TC" + (i+1) + ".png");
